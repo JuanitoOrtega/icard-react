@@ -83,7 +83,7 @@ export function AddEditProductForm(props) {
                 {previewImage ? 'Cambiar imagen' : 'Subir imagen'}
             </Button>
             <input {...getInputProps()} />
-            <Image src={previewImage} fluid />
+            <Image src={previewImage} size='small' centered rounded />
 
             <div className="add-edit-product-form__active">
                 <Checkbox

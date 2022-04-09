@@ -23,7 +23,7 @@ export function TableProductAdmin(props) {
                 {map(products, (product, index) => (
                     <Table.Row key={index}>
                         <Table.Cell>
-                            <Image src={product.image} size='tiny' />
+                            <Image src={product.image} size='tiny' rounded />
                         </Table.Cell>
                         <Table.Cell>
                             {product.title}

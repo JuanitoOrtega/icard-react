@@ -103,3 +103,64 @@ npm install react-dropzone
 -- Ahora nos vamos a nuestros hooks e importamos deleteProductApi dentro de useProduct.jsx
 -- En useProduct.jsx creamos una función flecha y le asignamos la constante deleteProduct, luego retornamos esta función en return
 -- Vamos a ProductsAdmin.jsx y dentro de los props recuperamos deleteProduct, luego ejecutamos esta función en onDeleteProduct, convirtiendo la función en asincrónica
+
+## NUEVA APP TABLES
+-- Dentro de pages/Admin creamos el archivo TablesAdmin.jsx
+-- Nos vamos al routes.admin.jsx e importamos la ruta
+
+# Creamos el fichero table.jsx dentro de la carpeta api
+-- Creamos la función getTablesApi() para traernos todas las mesas
+
+# Creamos nuestro hook
+-- En la carpeta hooks creamos el archivo useTable.jsx, importamos useState, getTablesApi, useAuth
+-- Creamos nuestro useTable(), dentro nos traemos todos nuestros useState:
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [tables, setTables] = useState(null);
+    const { auth } = useAuth();
+
+-- Creamos nuestra función para traernos todas las mesas, getTables()
+
+# Volvemos a nuestro archivo pages/Admin/TablesAdmin.jsx
+-- En TablesAdmin.jsx importamos nuestro hook useTable
+-- También nos traemos de React el useEffect
+
+import React, { useEffect } from 'react';
+import { HeaderPage } from '../../components/Admin';
+import { useTable } from '../../hooks';
+
+export function TablesAdmin() {
+    const { loading, tables, getTables } = useTable();
+
+    useEffect(() => {
+        getTables();
+    }, []);
+
+    console.log(tables);
+
+    return (
+        <>
+            <HeaderPage title='Mesas' btnTitle='Crear mesa' />
+        </>
+    );
+}
+
+-- De semantic nos traemos el Loader
+
+# Para imprimir la vista de mesas, creamos la carpeta Tables dentro de components/Admin
+-- En components/Admin/Tables creamos el fichero TableTablesAdmin.jsx
+-- Volvemos a TablesAdmin.jsx e importamos nuestro componente TableTablesAdmin
+-- Dentro del loading nos traemos TableTablesAdmin:
+
+    {loading ? (
+        <Loader active inline="centered">
+            Cargando mesas...
+        </Loader>
+    ) : (
+        <TableTablesAdmin tables={tables} />
+    )}
+
+-- En el archivo TableTablesAdmin.jsx importamos los recursos de semantic y map de lodash
+-- Recuperamos los props, tayendonos tables
+-- Creamos la función Actions(props), dentro de los props recuperamos table

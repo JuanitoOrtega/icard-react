@@ -51,7 +51,7 @@ export function AddEditCategoryForm(props) {
                 {previewImage ? 'Cambiar imagen' : 'Subir imagen'}
             </Button>
             <input {...getInputProps()} />
-            <Image src={previewImage} fluid />
+            <Image src={previewImage} size='small' centered rounded />
 
             <Button primary fluid type='submit' content={category ? 'Actualizar categoría' : 'Crear categoría'} />
         </Form>
