@@ -503,3 +503,185 @@ import { ReactComponent as ImgTable } from '../../../../assets/mesa.svg';
         </Button>
 
 -- Vamos a añadir un toggle para añadir peticiones automáticas
+
+# Obtendremos cuántos pedidos tiene una mesa
+-- Creamos archivo orders.py en la carpeta api
+-- Creamos la función getOrdersByTableApi para obtener los pedidos de una mesa:
+
+import { BASE_API } from '../utils/constants';
+
+export async function getOrdersByTableApi(id, status = '', ordering = '') {
+    try {
+        const tableFilter = `table=${id}`;
+        const statusFilter = `status=${status}`;
+        const closeFilter = 'close=False';
+
+        const url = `${BASE_API}/api/orders/?${tableFilter}&${statusFilter}&${closeFilter}&${ordering}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+-- Nos vamos a utils/constants.jsx y creamos constante ORDER_STATUS
+
+export const ORDER_STATUS = {
+    PENDING: 'PENDING',
+    DELIVERED: 'DELIVERED'
+}
+
+-- Vamos a utilizar la función getOrdersByTableApi directamente en nuestro componente TableAdmin.jsx, así que la importamos
+-- Importamos también la constante ORDER_STATUS
+-- También nos traemos useState, useEffect
+-- Ejecutamos useEffect:
+
+    useEffect(() => {
+        (async () => {
+            const response = await getOrdersByTableApi(
+                table.id,
+                ORDER_STATUS.PENDING
+            );
+            console.log(table.id);
+            console.log(response);
+        })();
+    }, []);
+
+-- Ahora vamos a mostrar las mesas que tienen pedidos pendientes
+-- Vamos a crear un nuevo estado de orders con un array vacío en TableAdmin para ver los pedidos que tiene una mesa
+
+    const [orders, setOrders] = useState([]);
+
+-- Incluímos nuestro setOrders en nuestra useEffect
+
+    useEffect(() => {
+        (async () => {
+            const response = await getOrdersByTableApi(
+                table.id,
+                ORDER_STATUS.PENDING
+            );
+            setOrders(response);
+        })();
+    }, []);
+
+-- Importamos size de lodash, lo que hace size es contar cuantos elementos tiene nuestro array
+-- También importamos Label de semantic
+-- Anadimos en nuestro return
+
+    {size(orders) > 0 ? (
+        <Label circular color='orange'>{size(orders)}</Label>
+    ) : null}
+
+-- Instalamos librería classnames
+npm install classnames
+
+-- Importamos classNames de classnames
+-- Modificamos nuestro <ImgTable... para añadirle la clase pending de forma condicional, solo para las mesas que tengan pedidos pendientes
+
+    <ImgTable
+        className={classNames({
+            pending: size(orders) > 0
+        })}
+    />
+
+-- Para mostrar las mesas ocupadas
+-- Creamos un nuevo estado para mostrar las mesas ocupadas
+
+    const [tableBusy, setTableBusy] = useState(false);
+
+-- Creamos un nuevo useEffect
+
+    useEffect(() => {
+        (async () => {
+            const response = await getOrdersByTableApi(
+                table.id,
+                ORDER_STATUS.DELIVERED
+            );
+            if (size(response) > 0) setTableBusy(response);
+            else setTableBusy(false);
+        })();
+    }, []);
+
+-- Incluimos nuestro estado tableBusy en <ImgTable
+
+    <ImgTable
+        className={classNames({
+            pending: size(orders) > 0,
+            busy: tableBusy
+        })}
+    />
+
+-- Para cargar la información de cada mesa
+-- En pages/Admin creamos archivo TableDetailsAdmin.jsx
+-- Importamos TableDetailsAdmin en routes.admin.jsx
+-- Importamos Link en TableAdmin.jsx
+-- Modificamos nuestro return
+
+    <Link className='table-admin' to={`/admin/table/${table.id}`}>
+        {size(orders) > 0 ? (
+            <Label circular color='orange'>{size(orders)}</Label>
+        ) : null}
+
+        <ImgTable
+            className={classNames({
+                pending: size(orders) > 0,
+                busy: tableBusy
+            })}
+        />
+        <p>Mesa {table.number}</p>
+    </Link>
+
+-- Reload de mesas
+-- En TablesListAdmin importamos el estado useState
+-- Usamos nuestro useState para controlar el reload de las mesas
+
+const [reload, setReload] = useState(false);
+
+-- Creamos el controlador del estado
+
+const onReload = () => setReload((prev) => !prev);
+
+-- Se lo pasamos al onClick de <Button
+
+    <Button primary icon className='tables-list-admin__reload' onClick={onReload}>
+        <Icon name='refresh' />
+    </Button>
+
+-- Ahora modificamos <TableAdmin... incluyendo reload={reload} />
+-- Importamos reload a través de los props en TableAdmin.jsx
+-- Añadimos también el estado reload a los useEffect
+-- En TablesListAdmin pasamos onReload al onClick del <Button
+
+-- Ahora vamos a crear un nuevo estado para el auto reload en TablesListAdmin
+
+    const [autoReload, setAutoReload] = useState(false);
+
+-- Inportamos useEffect, useEffect se va ejecutar cada vez que autoReload cambie
+
+    useEffect(() => {
+        if (autoReload) {
+            const autoReloadAction = () => {
+                onReload();
+                setTimeout(() => {
+                    autoReloadAction();
+                }, 5000);
+            }
+            autoReloadAction();
+        }
+    } , [autoReload]);
+
+-- Creamos función onCheckAutoReload 
+
+    const onCheckAutoReload = (check) => {
+        if (check) {
+            setAutoReload(true);
+        } else {
+            window.location.reload();
+        }
+    }
+
+-- Se la pasamos al <Checkbox
+
+<Checkbox toggle checked={autoReload} label='Reload automático' onChange={(_, data) => onCheckAutoReload(data.checked)} />
+

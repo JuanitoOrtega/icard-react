@@ -6,12 +6,27 @@
     align-items: center;
 
     &:hover {
-        opacity: 0.7;
+        opacity: 0.6;
         cursor: pointer;
     }
     
+    .ui.label {
+        margin: 0;
+        font-size: 20px;
+        position: absolute;
+        top: 20px;
+    }
+
     svg {
         width: 200px;
         height: 200px;
+
+        &.busy {
+            fill: #f1a009;
+        }
+
+        &.pending {
+            fill: #0094e3;
+        }
     }
 }

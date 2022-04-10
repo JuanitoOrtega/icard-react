@@ -9,7 +9,7 @@ export function AddEditTableForm(props) {
     const { onClose, onRefetch, table } = props;
     const { addTable, updateTable } = useTable();
 
-    console.log(table);
+    // console.log(table);
 
     const formik = useFormik({
         initialValues: initialValues(table),
