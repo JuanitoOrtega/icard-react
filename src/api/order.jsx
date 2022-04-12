@@ -1,5 +1,6 @@
-import { BASE_API } from '../utils/constants';
+import { BASE_API, ORDER_STATUS } from '../utils/constants';
 
+// Para traer toda la información de una orden
 export async function getOrdersByTableApi(id, status = '', ordering = '') {
     try {
         const tableFilter = `table=${id}`;
@@ -10,6 +11,48 @@ export async function getOrdersByTableApi(id, status = '', ordering = '') {
         const response = await fetch(url);
         const result = await response.json();
         return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Para marcar un pedido como entregado
+export async function checkDeliveredOrderApi(id) {
+    try {
+        const url = `${BASE_API}/api/orders/${id}/`;
+        const params = {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: ORDER_STATUS.DELIVERED
+            })
+        };
+        const response = await fetch(url, params);
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Para añadir un pedido
+export async function addOrderToTableApi(idTable, idProduct) {
+    try {
+        const url = `${BASE_API}/api/orders/`;
+        const params = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: ORDER_STATUS.PENDING,
+                table: idTable,
+                product: idProduct
+            })
+        };
+        await fetch(url, params);
     } catch (error) {
         throw error;
     }

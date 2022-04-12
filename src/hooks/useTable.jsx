@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { getTablesApi, addTableApi, updateTableApi, deleteTableApi } from '../api/table';
+import { getTablesApi, addTableApi, updateTableApi, deleteTableApi, getTableApi } from '../api/table';
 import { useAuth } from "./useAuth";
 
 export function useTable() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tables, setTables] = useState(null);
+    const [table, setTable] = useState(null);
     const { auth } = useAuth();
 
     // Get all tables
@@ -57,13 +58,28 @@ export function useTable() {
         }
     }
 
+    // Get a table number
+    const getTable = async (id) => {
+        try {
+            setLoading(true);
+            const response = await getTableApi(id);
+            setLoading(false);
+            setTable(response);
+        } catch (error) {
+            setLoading(false);
+            setError(error);
+        }
+    }
+
     return {
         loading,
         error,
         tables,
+        table,
         getTables,
         addTable,
         updateTable,
-        deleteTable
+        deleteTable,
+        getTable
     };
 }

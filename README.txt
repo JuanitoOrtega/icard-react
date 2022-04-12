@@ -685,3 +685,374 @@ const onReload = () => setReload((prev) => !prev);
 
 <Checkbox toggle checked={autoReload} label='Reload automático' onChange={(_, data) => onCheckAutoReload(data.checked)} />
 
+# Para obtener los pedidos de una mesa
+-- Vamos a crear un nuevo hook llamado useOrder.jsx
+-- Importamos useState y getOrdersByTableApi
+-- Creamos función useOrder y los estados:
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [orders, setOrders] = useState(null);
+
+-- Creamos nuestro useOrder
+-- Ahora nos vamos a TableDetailsAdmin e importamos aquí useOrder, también importaos useEffect
+
+const { loading, orders, getOrdersByTable } = useOrder();
+
+-- También importamos useParams
+-- Creamos nuestro useEffect y le pasamos getOrdersByTable con el id
+
+    useEffect(() => {
+        getOrdersByTable(id);
+    }, []);
+
+-- Vamos a cargar un loading y para ello importamos Loader de semantic
+-- También importamos HeaderPage de los componentes
+
+-- Crearemos un nuevo componente en components/Admin/TableDetails llamado ListOrderAdmin
+-- Mediante los props vamos a recibir los pedidos
+
+    const { orders } = props;
+
+-- Importamos map de lodash
+
+    return (
+        <div className='list-orders-admin'>
+            {map(orders, (order) => (
+                <h2 key={order.id}>Pedido...</h2>
+            ))}
+        </div>
+    );
+
+-- Importamos ListOrderAdmin en TableDetailsAdmin
+
+import { ListOrderAdmin } from '../../components/Admin/TableDetails';
+    ...
+    ...
+    ...
+
+    return (
+        <>
+            <HeaderPage title={`Mesa ****`} />
+            {loading ? (
+                <Loader active inline='centered'>
+                    Cargando...
+                </Loader>
+            ) : (
+                <ListOrderAdmin orders={orders} />
+            )}
+        </>
+    );
+-- Creamos un nuevo componente en components/Admin/TableDetails llamado OrderItemAdmin
+-- En ListOrderAdmin importamos nuestro componente recien creado OrderItemAdmin
+-- Tambien llamamos a OrderItemAdmin dentro del iterados map
+
+    <OrderItemAdmin key={order.id} order={order} />
+
+-- Importamos los recursos de semantic en OrderItemAdmin
+-- Nos traemos order a través del los props
+-- Editamos nuestro return
+
+    const { order } = props;
+    console.log(order);
+    const { title, image } = order.product_data;
+
+    return (
+        <div className='order-item-admin'>
+            <div className='order-item-admin__time'>{order.created_at}</div>
+
+            <div className='order-item-admin__product'>
+                <Image src={image} size='tiny' rounded />
+                <p>{title}</p>
+            </div>
+        </div>
+    );
+
+-- Ahora vamos a diferenciar entre los pedidos entregados y pendientes
+-- Importamos classNames y editamos nuestro return
+
+    return (
+        <div
+            className={classNames('order-item-admin', {
+                [order.status.toLowerCase()] : true
+            })}
+        >
+        ...
+
+-- Agrupamos los pedidos entregados y pendientes en la vista pedidos
+-- Modificamos nuestro useEffect en TableDetailsAdmin
+
+    useEffect(() => {
+        getOrdersByTable(id, '', 'ordering=-status,created_at');
+    }, []);
+
+# Para formatear la fecha
+-- Instalamos librería moment
+npm install moment
+
+-- En OrderItemAdmin importamos moment
+-- Editamos dentro del return
+
+    <div className='order-item-admin__time'>
+        <span>{moment(order.created_at).format('HH:mm')}</span> {' - '}
+        <span>{moment(order.created_at).startOf('seconds').fromNow()}</span>
+    </div>
+
+-- Para textos en español importamos: import 'moment/locale/es';
+
+# Para marcar un pedido como entregado
+-- Nos vamos a api/order.jsx y creamos la función checkDeliveredOrderApi
+-- Nos vamos al hook useOrder e importamos nuestra función checkDeliveredOrderApi
+-- En nuestro hook useOrder creamos la función checkDeliveredOrder
+-- Importamos nuestro hook useOrder en OrderItemAdmin
+
+    const { checkDeliveredOrder } = useOrder();
+
+    const onCheckDeliveredOrder = async () => {
+        try {
+            await checkDeliveredOrder(order.id);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+-- Importamos nuestra función onCheckDeliveredOrder en el onClick de nuestro <Button...
+-- Para recargar la lista importamos useState en TableDetailsAdmin
+
+    const [reloadOrders, setReloadOrders] = useState(false);
+    
+    ...
+
+    useEffect(() => {
+        getOrdersByTable(id, '', 'ordering=-status,created_at');
+    }, [reloadOrders]);
+
+    // console.log(orders);
+
+    const onReloadOrders = () => setReloadOrders((prev) => !prev);
+
+    return (
+        <>
+            ...
+                <ListOrderAdmin orders={orders} onReloadOrders={onReloadOrders} />
+            ...
+
+-- En OrderItemAdmin hacemos las siguientes modificaciones
+
+    ...
+    const { order, onReloadOrders } = props;
+    // console.log(order);
+    ...
+    const onCheckDeliveredOrder = async () => {
+        try {
+            await checkDeliveredOrder(order.id);
+            onReloadOrders();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+-- En ListOrderAdmin hacemos las siguientes modificaciones
+
+    const { orders, onReloadOrders } = props;
+
+    return (
+        <div className='list-orders-admin'>
+            {map(orders, (order) => (
+                <OrderItemAdmin key={order.id} order={order} onReloadOrders={onReloadOrders} />
+            ))}
+        </div>
+    );
+
+-- Para obtener el número de mesa
+-- Nos vamos a api/table.jsx y creamos la función getTableApi(id)
+-- Nos vamos al hook useTable e importamos getTableApi
+-- Creamos nuestros estados:
+
+    const [table, setTable] = useState(null);
+
+-- Creamos la siguiente función
+
+    const getTable = async (id) => {
+        try {
+            setLoading(true);
+            const response = await getTableApi(id);
+            setLoading(false);
+            setTable(response);
+        } catch (error) {
+            setLoading(false);
+            setError(error);
+        }
+    }
+
+-- Retornamos table y getTable
+
+    return {
+        loading,
+        error,
+        tables,
+        table,
+        getTables,
+        addTable,
+        updateTable,
+        deleteTable,
+        getTable
+    };
+
+-- Importamos nuestro hook useTable en TableDetailsAdmin
+-- Recuperamos nuestro hook en TableDetailsAdmin
+
+const { table, getTable } = useTable();
+
+-- Modificamos nuestro useEffect y creamos otro
+
+    useEffect(() => {
+        getOrdersByTable(id, '', 'ordering=-status,created_at');
+    }, [id, reloadOrders]);
+
+    useEffect(() => getTable(id), [id]);
+
+-- Modificamos nuestro return
+
+    return (
+        <>
+            <HeaderPage title={`Mesa ${table?.number || ''}`} />
+            ...
+
+# Añadir pedidos por parte del usuario cajero
+-- En TableDetailsAdmin importamos ModalBasic
+-- Añadimos un btnTitle="" para crear un botón
+-- Creamos un estado para controlar el modal
+
+    const [showModal, setShowModal] = useState(false);
+
+-- Creamos función openCloseModal
+
+    const openCloseModal = () => setShowModal((prev) => !prev);
+
+-- Modificamos el HeaderPage y Añadimos <ModalBasic
+
+    <HeaderPage title={`Mesa ${table?.number || ''}`} btnTitle='Añadir pedido' btnClick={openCloseModal} />
+    ...
+    <ModalBasic show={showModal} onClose={openCloseModal} title='Generar pedido'>
+        <p>Contenido del modal...</p>
+    </ModalBasic>
+
+-- Creamos un nuevo componente llamado AddOrderForm dentro de components/Admin/Order
+-- Importamos recursos de semantic
+-- Creamos nuestro form
+
+    <Form className='add-order-form'>
+        <Dropdown placeholder='Productos' fluid selection search />
+
+        <div className='add-order-form__list'>
+            {/* For de productos seleccionados... */}
+        </div>
+
+        <Button type='submit' content='Añadir pedido' primary fluid />
+    </Form>
+
+-- Llamamos a nuestro form desde TableDetailsAdmin, para lo cual importamos AddOrderForm
+-- Para mostrar los productos en el Dropdown importamos el hook useProduct en AddOrderForm
+-- Importamos también { useState, useEffect } de react
+-- Usamos nuestro useProduct y nos traemos products y getProducts
+-- Creamos nuestro useEffect
+
+    useEffect(() => getProducts(), []);
+
+-- Creamos una función especial para formatear los datos para el Dropdown
+
+function formatDropdownData(data) {
+    return map(data, (item) => ({
+        key: item.id,
+        text: item.title,
+        value: item.id
+    }));
+}
+
+-- Creamos un estado para controlar esta función
+
+    const [productsFormat, setProductsFormat] = useState([]);
+
+# Dropdown
+-- Necesitamos importar useState y useEffect
+-- Se necesita dar un formato especial a los datos para trabajar con el Dropdown
+-- Creamos una función especial para esto:
+
+function formatDropdownData(data) {
+    return map(data, (item) => ({
+        key: item.id,
+        text: item.title,
+        value: item.id
+    }));
+}
+
+-- Creamos nuestro estado para controlarlo
+
+    const [productsFormat, setProductsFormat] = useState([]);
+
+-- Lo integramos al Dropdown de la siguiente forma
+
+<Dropdown placeholder='Productos' fluid selection search options={productsFormat} value={null} />
+
+-- Añadimos formik y yup para validar nuestro form
+
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+
+-- Creamos initialValues con un array vacío para products
+
+function initialValues() {
+    return {
+        products: []
+    };
+}
+
+-- Creamos función validationSchema
+
+function validationSchema() {
+    return {
+        products: Yup.array().required(true)
+    };
+}
+
+-- Creamos la función formik
+
+    const formik = useFormik({
+        initialValues: initialValues(),
+        validationSchema: Yup.object(validationSchema()),
+        onSubmit: async (formValue) => {
+            console.log('Creando pedidos');
+            console.log(formValue);
+        }
+    });
+
+-- Añadimos formik a nuestro form
+-- Para añadir productos y se cree un array con todos los productos añadidos
+-- Vamos a escoger todos los productos que tengamos en el estado de products y hacemos un expres operator
+
+onChange={(_, data) => formik.setFieldValue('products', [...formik.values.products, data.value])}
+
+...formik.values.products // Esto nos devuelve el array de productos que tenemos ya creado
+data.value // nos añade el array como nuevo value
+
+// Con esto estamos diciendo, que nos saque todos los valores que tengamos en el estado de products y que nos lo setee al nuevo valor data.value
+
+# Listando los productos seleccionados
+-- Creamos un nuevo estado para controlar los productos listados
+
+    const [productsData, setProductsData] = useState([]);
+
+-- Creamos una función llamada addProductList
+-- Creamos un useEffect
+
+    useEffect(() => addProductList(), [formik.values]);
+
+-- Creamos una nueva función en api/product.jsx para obtener un producto por id, función llamada getProductByIdApi
+-- Importamos la función en nuestro hook de product y creamos otra función llamada getProductById
+-- Nos vamos a AddOrderForm e importamos nuestra función getProductById en nuestro hook useProduct
+
+# Para crear la lógica que añadirá un pedido
+-- Creamos una función para ello en el archivo api/order.jsx llamada addOrderToTableApi
+-- Nos vamos a nuestro useOrder e importamos la función creada addOrderToTableApi y creamos la función addOrderToTable
+-- Nos vamos a nuestro AddOrderForm e importamos nuestro hook useOrder
