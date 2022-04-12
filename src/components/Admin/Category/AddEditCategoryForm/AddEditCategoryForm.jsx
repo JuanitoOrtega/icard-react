@@ -45,7 +45,16 @@ export function AddEditCategoryForm(props) {
 
     return (
         <Form className='add-edit-category-form' onSubmit={formik.handleSubmit}>
-            <Form.Input name='title' placeholder='Nombre de la categoría' value={formik.values.title} onChange={formik.handleChange} error={formik.errors.title} />
+            <Form.Input
+                name='title'
+                type='text'
+                iconPosition='left'
+                icon='tag'
+                placeholder='Nombre de la categoría'
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                error={formik.errors.title}
+            />
 
             <Button fluid type='button' color={formik.errors.image && 'red'} {...getRootProps()}>
                 {previewImage ? 'Cambiar imagen' : 'Subir imagen'}

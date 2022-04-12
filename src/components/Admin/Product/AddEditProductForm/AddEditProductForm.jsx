@@ -53,6 +53,9 @@ export function AddEditProductForm(props) {
         <Form className='add-edit-product-form' onSubmit={formik.handleSubmit}>
             <Form.Input
                 name='title'
+                type='text'
+                iconPosition='left'
+                icon='box'
                 placeholder='Nombre del producto'
                 value={formik.values.title}
                 onChange={formik.handleChange}
@@ -73,6 +76,8 @@ export function AddEditProductForm(props) {
             <Form.Input
                 type='number'
                 name='price'
+                iconPosition='left'
+                icon='dollar'
                 placeholder='Precio'
                 value={formik.values.price}
                 onChange={formik.handleChange}

@@ -32,6 +32,9 @@ export function AddEditUserForm(props) {
         <Form className="add-edit-user-form" onSubmit={formik.handleSubmit}>
         <Form.Input
             name="username"
+            type="text"
+            iconPosition="left"
+            icon="user"
             placeholder="Nombre de usuario"
             value={formik.values.username}
             onChange={formik.handleChange}
@@ -40,6 +43,8 @@ export function AddEditUserForm(props) {
         <Form.Input
             name="email"
             type="email"
+            iconPosition='left'
+            icon='at'
             placeholder="Correo electrónico"
             value={formik.values.email}
             onChange={formik.handleChange}
@@ -47,6 +52,9 @@ export function AddEditUserForm(props) {
         />
         <Form.Input
             name="first_name"
+            type="text"
+            iconPosition='left'
+            icon='address book'
             placeholder="Nombre"
             value={formik.values.first_name}
             onChange={formik.handleChange}
@@ -54,6 +62,9 @@ export function AddEditUserForm(props) {
         />
         <Form.Input
             name="last_name"
+            type="text"
+            iconPosition='left'
+            icon='address book outline'
             placeholder="Apellidos"
             value={formik.values.last_name}
             onChange={formik.handleChange}
@@ -62,6 +73,8 @@ export function AddEditUserForm(props) {
         <Form.Input
             name="password"
             type="password"
+            iconPosition="left"
+            icon="lock"
             placeholder="Contraseña"
             value={formik.values.password}
             onChange={formik.handleChange}
