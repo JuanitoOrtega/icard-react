@@ -16,7 +16,7 @@ export function TablesAdmin() {
         getTables();
     }, [refetch]);
 
-    console.log(tables);
+    // console.log(tables);
 
     const openCloseModal = () => setShowModal((prev) => !prev);
     const onRefetch = () => setRefetch((prev) => !prev);

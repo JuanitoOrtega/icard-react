@@ -85,3 +85,17 @@ export async function getTableApi(id) {
         throw error;
     }
 }
+
+// Get table by number
+export async function getTableByNumberApi(tableNumber) {
+    try {
+        const tableFilter = `number=${tableNumber}`;
+
+        const url = `${BASE_API}/api/tables/?${tableFilter}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        throw error;
+    }
+}

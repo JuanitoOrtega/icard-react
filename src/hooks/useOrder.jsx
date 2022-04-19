@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { getOrdersByTableApi, checkDeliveredOrderApi, addOrderToTableApi } from '../api/order';
+import { getOrdersByTableApi, checkDeliveredOrderApi, addOrderToTableApi, addPaymentToOrderApi, closeOrderApi, getOrdersByPaymentApi } from '../api/order';
 
 export function useOrder() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [orders, setOrders] = useState(null);
 
-    const getOrdersByTable = async (id, status, ordering) => {
+    const getOrdersByTable = async (idTable, status, ordering) => {
         try {
             setLoading(true);
-            const response = await getOrdersByTableApi(id, status, ordering);
+            const response = await getOrdersByTableApi(idTable, status, ordering);
             setLoading(false);
             setOrders(response);
         } catch (error) {
@@ -18,28 +18,45 @@ export function useOrder() {
         }
     }
 
-    const checkDeliveredOrder = async (id) => {
+    const checkDeliveredOrder = async (idOrder) => {
         try {
-            setLoading(true);
-            const response = await checkDeliveredOrderApi(id);
-            setLoading(false);
-            setOrders(response);
+            await checkDeliveredOrderApi(idOrder);
         } catch (error) {
-            setLoading(false);
             setError(error);
         }
     }
 
     const addOrderToTable = async (idTable, idProduct) => {
         try {
-            setLoading(true);
             await addOrderToTableApi(idTable, idProduct);
-            setLoading(false);
         } catch (error) {
-            setLoading(false);
             setError(error);
         }
     }
+
+    const addPaymentToOrder = async (idOrder, idPayment) => {
+        try {
+            await addPaymentToOrderApi(idOrder, idPayment);
+        } catch (error) {
+            setError(error);
+        }
+    }
+
+    const closeOrder = async (idOrder) => {
+        try {
+            await closeOrderApi(idOrder);
+        } catch (error) {
+            setError(error);
+        }
+    }
+
+    const getOrdersByPayment = async (idPayment) => {
+        try {
+            return await getOrdersByPaymentApi(idPayment);
+        } catch (error) {
+            setError(error);
+        }
+    };
 
     return {
         loading,
@@ -47,6 +64,9 @@ export function useOrder() {
         orders,
         getOrdersByTable,
         checkDeliveredOrder,
-        addOrderToTable
+        addOrderToTable,
+        addPaymentToOrder,
+        closeOrder,
+        getOrdersByPayment
     }
 }

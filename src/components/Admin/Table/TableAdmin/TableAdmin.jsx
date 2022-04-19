@@ -6,12 +6,15 @@ import { Label } from 'semantic-ui-react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import { ReactComponent as ImgTable } from '../../../../assets/table.svg';
+import { usePayment } from '../../../../hooks';
 import './TableAdmin.scss';
 
 export function TableAdmin(props) {
     const { table, reload } = props;
     const [orders, setOrders] = useState([]);
     const [tableBusy, setTableBusy] = useState(false);
+    const [pendingPayment, setPendingPayment] = useState(false);
+    const { getPaymentByTable } = usePayment();
 
     // console.log(orders);
 
@@ -35,7 +38,16 @@ export function TableAdmin(props) {
             else setTableBusy(false);
         })();
     }, [reload]);
-    
+
+    useEffect(() => {
+        (async () => {
+            const response = await getPaymentByTable(table.id);
+            if (size(response) > 0) setPendingPayment(response);
+            else setPendingPayment(false);
+            // console.log('Table ID --->', table.id);
+            // console.log(response);
+        })();
+    }, [reload]);
 
     return (
         <Link className='table-admin' to={`/admin/table/${table.id}`}>
@@ -43,10 +55,17 @@ export function TableAdmin(props) {
                 <Label circular color='orange'>{size(orders)}</Label>
             ) : null}
 
+            {pendingPayment && (
+                <Label circular color='orange'>
+                    Cuenta
+                </Label>
+            )}
+
             <ImgTable
                 className={classNames({
                     pending: size(orders) > 0,
-                    busy: tableBusy
+                    busy: tableBusy,
+                    'pending-payment': pendingPayment
                 })}
             />
             <p>Mesa {table.number}</p>

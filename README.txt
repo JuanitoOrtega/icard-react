@@ -1056,3 +1056,16 @@ data.value // nos añade el array como nuevo value
 -- Creamos una función para ello en el archivo api/order.jsx llamada addOrderToTableApi
 -- Nos vamos a nuestro useOrder e importamos la función creada addOrderToTableApi y creamos la función addOrderToTable
 -- Nos vamos a nuestro AddOrderForm e importamos nuestro hook useOrder
+
+# Vamos a crear la opción de pedir la cuenta desde administración
+
+# Creando la cuenta de la mesa
+-- Vamos a crear el archivo api/payment.jsx, creamos aquí la función createPaymentApi
+-- Creamos nuestro hook usePayment.jsx, aquí importamos createPaymentApi
+
+# Asociar un pago a un pedido
+-- Nos vamos a api/order.jsx y creamos la función addPaymentToOrderApi que asocie un pago a una orden
+-- Nos vamos al hook useOrder e importamos la función addPaymentToOrderApi
+
+# Instalamos librería para generar QR para cada mesa
+npm i qrcode.react

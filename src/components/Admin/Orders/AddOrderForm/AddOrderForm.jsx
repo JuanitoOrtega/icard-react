@@ -74,6 +74,9 @@ export function AddOrderForm(props) {
                             <Image src={product.image} avatar size='tiny' />
                             <span>{product.title}</span>
                         </div>
+                        <div>
+                            <span>{product.price}</span>
+                        </div>
                         <Button type='button' content='Eliminar' basic color='red' onClick={() => removeProductList(index)} />
                     </div>
                 ))}
