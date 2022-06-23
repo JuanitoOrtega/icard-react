@@ -1069,3 +1069,7 @@ data.value // nos añade el array como nuevo value
 
 # Instalamos librería para generar QR para cada mesa
 npm i qrcode.react
+
+# DEPLOY
+-- Ejecutamos
+npm run build
